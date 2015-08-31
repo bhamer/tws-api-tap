@@ -52,7 +52,20 @@ private static async void ProcessTickPrices(IbClient ibClient)
 
 
 ### Future State
-Considering using cancellation tokens to cancel requests instead of having to know and call an associated cancel request method.
+Considering using cancellation tokens to cancel data requests instead of having to call an associated cancel request method with the original ticker id. Cancellation-tokens branch has proof of concept code.
+
+This:
+``` C#
+var cts = new CancellationTokenSource();
+ibClient.Request.ReqMktData(1001, ContractSamples.getEurUsdForex(), "", false, GetFakeParameters(3), cts.Token);
+cts.Cancel(); // cancel market data request
+```
+
+Instead of this:
+``` C#
+ibClient.Request.ReqMktData(1001, ContractSamples.getEurUsdForex(), "", false, GetFakeParameters(3), cts.Token);
+ibClient.Request.CancelMktData(1001);
+```
 
 
 

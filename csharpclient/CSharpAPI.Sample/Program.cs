@@ -19,7 +19,6 @@ namespace Samples
             {
                 try
                 {
-                    // these methods replace the EWrapperImpl class so you only need to implement handlers for what you care about
                     ProcessErrors(ibClient);
                     ProcessTickPrices(ibClient);
                     ProcessTickSizes(ibClient);
@@ -28,13 +27,11 @@ namespace Samples
                     ibClient.Connect("127.0.0.1", 7496, 0);
 
 
-                    var t = ibClient.Response.CurrentTimeAsync();
-                    ibClient.Request.ReqCurrentTime();
-                    t.Wait(); // get time from server synchronously by waiting on the Task to complete
-                    Console.WriteLine("Thread {0}: Server time is {1}", Thread.CurrentThread.ManagedThreadId, t.Result);
-
-                    // test IB methods asynchronously
-                    TestIbMethods(ibClient);
+                    var cts = new CancellationTokenSource();
+                    ibClient.Request.ReqMktData(1001, ContractSamples.getEurUsdForex(), "", false, GetFakeParameters(3), cts.Token);
+                    Console.ReadLine();
+                    //ibClient.Request.CancelMktData(1001);
+                    cts.Cancel();
 
                     Console.ReadLine();
                     Console.WriteLine("Disconnecting...");

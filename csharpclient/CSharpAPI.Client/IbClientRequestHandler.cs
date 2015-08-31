@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace IBApi
@@ -84,7 +85,7 @@ namespace IBApi
         /// <param name="genericTickList">Comma separated ids of the available generic ticks.</param>
         /// <param name="snapshot">When set to true, it will provide a single snapshot of the available data. Set to false if you want to receive continuous updates.</param>
         /// <param name="mktDataOptions"></param>
-        public void ReqMktData(int tickerId, Contract contract, string genericTickList, bool snapshot, List<TagValue> mktDataOptions)
+        public void ReqMktData(int tickerId, Contract contract, string genericTickList, bool snapshot, List<TagValue> mktDataOptions, CancellationToken token)
         {
             CheckConnection();
             if (snapshot) CheckServerVersion(tickerId, MinServerVer.SNAPSHOT_MKT_DATA, " It does not support snapshot market data requests.");
@@ -155,6 +156,9 @@ namespace IBApi
                 paramsList.AddParameter(TagValueListToString(mktDataOptions));
             }
             ibClientConnection.IbWriter.Send(tickerId, paramsList, EClientErrors.FAIL_SEND_REQMKT);
+
+            // register cancellation callback
+            token.Register(() => { CancelMktData(tickerId); });
         }
 
         /// <summary>

@@ -54,8 +54,7 @@ namespace IBApi
             {
                 while (!processMessagesCT.IsCancellationRequested)
                 {
-                    incomingMessageType = ibClientConnection.IbReader.ReadInt();
-                    Console.WriteLine("Received message of type {0}", incomingMessageType);
+                    incomingMessageType = ibClientConnection.IbReader.ReadInt();                    
                     ProcessMessage(incomingMessageType);
                 }
             }
